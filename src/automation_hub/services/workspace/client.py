@@ -1,23 +1,73 @@
-from automation_hub.core.service import BaseService
+import os.path
+import logging
 from typing import Any, Dict
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+from automation_hub.core.service import BaseService
+from automation_hub.services.workspace.calendar import CalendarManager
+from automation_hub.services.workspace.sheets import SheetsManager
+from automation_hub.services.workspace.tasks import TasksManager
+
+SCOPES = [
+    'https://www.googleapis.com/auth/calendar',
+    'https://www.googleapis.com/auth/spreadsheets.readonly',
+    'https://www.googleapis.com/auth/tasks.readonly'
+]
 
 class WorkspaceService(BaseService):
-    """Google Workspace integration stub."""
+    """Orchestrator for Google Workspace services."""
+
+    def __init__(self, config: Dict[str, Any] = None):
+        super().__init__(config)
+        self.creds = None
+        self.calendar: CalendarManager = None
+        self.sheets: SheetsManager = None
+        self.tasks: TasksManager = None
 
     def connect(self) -> bool:
+        """Handles Auth and initializes specialized managers."""
         self.logger.info("Connecting to Google Workspace...")
-        # Add real connection logic using google-api-python-client
-        return True
+        logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+
+        token_path = 'token.json'
+        creds_path = 'credentials.json'
+
+        if os.path.exists(token_path):
+            self.creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+
+        if not self.creds or not self.creds.valid:
+            try:
+                if self.creds and self.creds.expired and self.creds.refresh_token:
+                    self.logger.info("Refreshing token...")
+                    self.creds.refresh(Request())
+                else:
+                    if not os.path.exists(creds_path):
+                        self.logger.error(f"Falta {creds_path}")
+                        return False
+                    flow = InstalledAppFlow.from_client_secrets_file(creds_path, SCOPES)
+                    self.creds = flow.run_local_server(port=0, access_type='offline', prompt='consent')
+                
+                with open(token_path, 'w') as token:
+                    token.write(self.creds.to_json())
+            except Exception as e:
+                self.logger.error(f"Auth error: {e}")
+                return False
+
+        try:
+            self.calendar = CalendarManager(build('calendar', 'v3', credentials=self.creds, static_discovery=False))
+            self.sheets = SheetsManager(build('sheets', 'v4', credentials=self.creds, static_discovery=False))
+            self.tasks = TasksManager(build('tasks', 'v1', credentials=self.creds, static_discovery=False))
+            
+            self.logger.info("Workspace connected and managers initialized.")
+            return True
+        except Exception as e:
+            self.logger.error(f"Build error: {e}")
+            return False
 
     def disconnect(self):
-        self.logger.info("Disconnecting from Google Workspace.")
-
-    def manage_calendar(self, action: str, details: Dict[str, Any]):
-        """Manage calendar events."""
-        self.logger.info(f"Managing calendar: {action} with {details}")
-        return {"status": "success", "action": action}
-
-    def read_sheet(self, spreadsheet_id: str, range_name: str):
-        """Read data from a Google Sheet."""
-        self.logger.info(f"Reading sheet {spreadsheet_id} at {range_name}")
-        return {"data": []}
+        self.calendar = None
+        self.sheets = None
+        self.tasks = None

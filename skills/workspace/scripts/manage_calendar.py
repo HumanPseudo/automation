@@ -15,7 +15,8 @@ def main():
         details = json.loads(args.details)
         client = WorkspaceService()
         if client.connect():
-            result = client.manage_calendar(args.action, details)
+            # Llamada al manager específico de calendario
+            result = client.calendar.manage_calendar(args.action, details)
             print(json.dumps(result))
             client.disconnect()
         else:
