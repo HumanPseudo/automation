@@ -1,4 +1,4 @@
-import os.path
+import os
 import logging
 from typing import Any, Dict
 from google.auth.transport.requests import Request
@@ -53,7 +53,9 @@ class WorkspaceService(BaseService):
                         port=0, access_type="offline", prompt="consent"
                     )
 
-                with open(token_path, "w") as token:
+                # Ensure token.json is created with 600 permissions (owner read/write only)
+                fd = os.open(token_path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+                with os.fdopen(fd, "w") as token:
                     token.write(self.creds.to_json())
             except Exception as e:
                 self.logger.error(f"Auth error: {e}")
