@@ -4,8 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+requests = ">=2.31.0"
+python-dotenv = ">=1.0.0"
+pydantic = ">=2.5.0"
+google-api-python-client = ">=2.100.0"
+google-auth-oauthlib = ">=1.1.0"
+google-auth = ">=2.23.0"
+# Esto instala tu propio paquete 'automation_hub' en modo editable
+automation-hub = {editable = true, path = "."}
 
 [dev-packages]
+pytest = "*"
+ruff = "*"
 
 [requires]
-python_version = "3.14"
+python_version = "3.12"

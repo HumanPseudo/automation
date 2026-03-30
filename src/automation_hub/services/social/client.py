@@ -1,5 +1,5 @@
 from automation_hub.core.service import BaseService
-from typing import Any, Dict
+
 
 class SocialService(BaseService):
     """Social media integration stub."""
