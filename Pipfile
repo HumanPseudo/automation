@@ -15,6 +15,7 @@ automation-hub = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"
+ruff = "*"
 
 [requires]
 python_version = "3.14"

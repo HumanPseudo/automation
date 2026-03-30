@@ -12,10 +12,11 @@ from automation_hub.services.workspace.sheets import SheetsManager
 from automation_hub.services.workspace.tasks import TasksManager
 
 SCOPES = [
-    'https://www.googleapis.com/auth/calendar',
-    'https://www.googleapis.com/auth/spreadsheets.readonly',
-    'https://www.googleapis.com/auth/tasks.readonly'
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/spreadsheets.readonly",
+    "https://www.googleapis.com/auth/tasks.readonly",
 ]
+
 
 class WorkspaceService(BaseService):
     """Orchestrator for Google Workspace services."""
@@ -30,10 +31,10 @@ class WorkspaceService(BaseService):
     def connect(self) -> bool:
         """Handles Auth and initializes specialized managers."""
         self.logger.info("Connecting to Google Workspace...")
-        logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+        logging.getLogger("googleapiclient.discovery_cache").setLevel(logging.ERROR)
 
-        token_path = 'token.json'
-        creds_path = 'credentials.json'
+        token_path = "token.json"
+        creds_path = "credentials.json"
 
         if os.path.exists(token_path):
             self.creds = Credentials.from_authorized_user_file(token_path, SCOPES)
@@ -48,19 +49,27 @@ class WorkspaceService(BaseService):
                         self.logger.error(f"Falta {creds_path}")
                         return False
                     flow = InstalledAppFlow.from_client_secrets_file(creds_path, SCOPES)
-                    self.creds = flow.run_local_server(port=0, access_type='offline', prompt='consent')
-                
-                with open(token_path, 'w') as token:
+                    self.creds = flow.run_local_server(
+                        port=0, access_type="offline", prompt="consent"
+                    )
+
+                with open(token_path, "w") as token:
                     token.write(self.creds.to_json())
             except Exception as e:
                 self.logger.error(f"Auth error: {e}")
                 return False
 
         try:
-            self.calendar = CalendarManager(build('calendar', 'v3', credentials=self.creds, static_discovery=False))
-            self.sheets = SheetsManager(build('sheets', 'v4', credentials=self.creds, static_discovery=False))
-            self.tasks = TasksManager(build('tasks', 'v1', credentials=self.creds, static_discovery=False))
-            
+            self.calendar = CalendarManager(
+                build("calendar", "v3", credentials=self.creds, static_discovery=False)
+            )
+            self.sheets = SheetsManager(
+                build("sheets", "v4", credentials=self.creds, static_discovery=False)
+            )
+            self.tasks = TasksManager(
+                build("tasks", "v1", credentials=self.creds, static_discovery=False)
+            )
+
             self.logger.info("Workspace connected and managers initialized.")
             return True
         except Exception as e:
