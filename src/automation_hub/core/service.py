@@ -1,6 +1,6 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict
-import logging
 
 
 class BaseService(ABC):

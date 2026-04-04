@@ -1,7 +1,8 @@
 import unittest
 from unittest.mock import MagicMock, patch
-from automation_hub.services.workspace.client import WorkspaceService
+
 from automation_hub.services.social.client import SocialService
+from automation_hub.services.workspace.client import WorkspaceService
 
 
 class TestAutomationHub(unittest.TestCase):

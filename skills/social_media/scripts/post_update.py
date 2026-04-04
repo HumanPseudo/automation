@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import json
+
 from automation_hub.services.social.client import SocialService
 
 

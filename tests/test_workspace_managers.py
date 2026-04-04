@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
+
 from automation_hub.services.workspace.calendar import CalendarManager
 
 

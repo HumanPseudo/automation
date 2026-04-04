@@ -123,6 +123,7 @@ venv.bak/
 # Google Workspace Sensitive Files
 credentials.json
 token.json
+automation-hub.json
 
 # Spyder project settings
 .spyderproject
