@@ -1,0 +1,25 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = ">=2.31.0"
+python-dotenv = ">=1.0.0"
+pydantic = ">=2.5.0"
+google-api-python-client = ">=2.100.0"
+google-auth-oauthlib = ">=1.1.0"
+google-auth = ">=2.23.0"
+psycopg2-binary = "*"
+sqlalchemy = ">=2.0.0"
+alembic = ">=1.12.0"
+# Esto instala tu propio paquete 'automation_hub' en modo editable
+automation-hub = {editable = true, path = "."}
+
+[dev-packages]
+pytest = "*"
+ruff = "*"
+mypy = "*"
+
+[requires]
+python_version = "3.12"
